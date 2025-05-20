@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SAKI </title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 16px 32px;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <button id="start">UNLEASH SAKI </button>
+
+  <script>
+    let intervalId = null;
+
+    function openSakiWindow() {
+      const screenWidth = screen.availWidth;
+      const screenHeight = screen.availHeight;
+
+      const width = 300;
+      const height = 300;
+
+      const left = Math.floor(Math.random() * (screenWidth - width));
+      const top = Math.floor(Math.random() * (screenHeight - height));
+
+      const features = `width=${width},height=${height},left=${left},top=${top}`;
+      const win = window.open("", "_blank", features);
+
+      if (win) {
+        win.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>SAKI Virus</title>
+            <style>
+              body {
+                background-color: black;
+                margin: 0;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+              }
+              img {
+                width: 150px;
+                height: auto;
+              }
+            </style>
+          </head>
+          <body>
+            <img src="saki.gif" alt="SAKI">
+            <script>
+              let moveX = 5;
+              let moveY = 4;
+
+              setInterval(() => {
+                let x = window.screenX + moveX;
+                let y = window.screenY + moveY;
+
+                if (x + window.outerWidth >= screen.availWidth || x <= 0) moveX *= -1;
+                if (y + window.outerHeight >= screen.availHeight || y <= 0) moveY *= -1;
+
+                window.moveTo(x, y);
+              }, 20);
+            <\/script>
+          </body>
+          </html>
+        `);
+        win.document.close();
+      }
+    }
+
+    document.getElementById("start").addEventListener("click", () => {
+      if (!intervalId) {
+        intervalId = setInterval(openSakiWindow, 5); // 50x faster
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key.toLowerCase() === 'p' && intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        alert("SAKI virus stopped!");
+      }
+    });
+  </script>
+</body>
+</html>
