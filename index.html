@@ -39,7 +39,7 @@
           <!DOCTYPE html>
           <html>
           <head>
-            <title>SAKI Virus</title>
+            <title>SAKI</title>
             <style>
               body {
                 background-color: black;
@@ -59,7 +59,7 @@
           <body>
             <img src="saki.gif" alt="SAKI">
             <audio autoplay>
-              <source src="saki.mp3" type="audio/mpeg">
+              <source src="scream.mp3" type="audio/mpeg">
             </audio>
             <script>
               let moveX = 5;
@@ -79,12 +79,10 @@
       }
     }
 
-    // AUTO-START IMMEDIATELY ON LOAD
     window.onload = () => {
       intervalId = setInterval(openSakiWindow, 2.5);
     };
 
-    // STOPPING WITH "P"
     document.addEventListener("keydown", (event) => {
       if (event.key.toLowerCase() === 'p' && intervalId) {
         clearInterval(intervalId);
@@ -92,10 +90,9 @@
         windows.forEach(win => {
           if (!win.closed) win.close();
         });
-        alert("SAKI virus stopped!");
+        alert("SAKI stopped!");
       }
     });
   </script>
 </body>
 </html>
-
