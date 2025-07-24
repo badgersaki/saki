@@ -13,10 +13,37 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      flex-direction: column;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 16px 32px;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
+  <h1>UNLEASH SAKI</h1>
+  <button id="start">UNLEASH SAKI</button>
+
+  <audio id="scream" loop>
+    <source src="scream.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
     let intervalId = null;
     const windows = [];
@@ -58,9 +85,6 @@
           </head>
           <body>
             <img src="saki.gif" alt="SAKI">
-            <audio autoplay>
-              <source src="scream.mp3" type="audio/mpeg">
-            </audio>
             <script>
               let moveX = 5;
               let moveY = 4;
@@ -79,14 +103,22 @@
       }
     }
 
-    window.onload = () => {
-      intervalId = setInterval(openSakiWindow, 2.5);
-    };
+    document.getElementById("start").addEventListener("click", () => {
+      const scream = document.getElementById("scream");
+      scream.play().catch(e => {
+        alert("Audio playback failed. Tap again or allow media autoplay.");
+      });
+
+      if (!intervalId) {
+        intervalId = setInterval(openSakiWindow, 2.5);
+      }
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key.toLowerCase() === 'p' && intervalId) {
         clearInterval(intervalId);
         intervalId = null;
+        document.getElementById("scream").pause();
         windows.forEach(win => {
           if (!win.closed) win.close();
         });
