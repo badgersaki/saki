@@ -4,10 +4,12 @@
   <meta charset="utf-8">
   <title>SAKI</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Impact&display=swap');
+
     body {
       background-color: black;
       color: white;
-      font-family: sans-serif;
+      font-family: 'Impact', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,30 +19,31 @@
     }
 
     button {
-      background-color: #4CAF50;
+      background-color: #e60000;
       color: white;
       padding: 16px 32px;
-      font-size: 20px;
+      font-size: 24px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-family: 'Impact', sans-serif;
     }
 
     button:hover {
-      background-color: #45a049;
+      background-color: #b30000;
     }
 
     h1 {
       margin-bottom: 20px;
       text-align: center;
+      font-size: 48px;
     }
   </style>
 </head>
 <body>
   <h1>UNLEASH SAKI</h1>
-  <button id="start">UNLEASH SAKI</button>
+  <button id="start">UNLEASH</button>
 
-  <!-- Constant looping scream -->
   <audio id="scream" loop>
     <source src="scream.mp3" type="audio/mpeg">
   </audio>
@@ -51,17 +54,13 @@
     const windows = [];
 
     function openSakiWindow() {
-      const screenWidth = screen.availWidth;
-      const screenHeight = screen.availHeight;
       const width = 300;
       const height = 300;
-
-      const left = Math.floor(Math.random() * (screenWidth - width));
-      const top = Math.floor(Math.random() * (screenHeight - height));
+      const left = Math.floor(Math.random() * (screen.availWidth - width));
+      const top = Math.floor(Math.random() * (screen.availHeight - height));
       const features = `width=${width},height=${height},left=${left},top=${top}`;
 
       const win = window.open("", "_blank", features);
-
       if (win) {
         windows.push(win);
         win.document.write(`
@@ -71,13 +70,23 @@
             <title>SAKI</title>
             <style>
               body {
-                background-color: black;
                 margin: 0;
+                background-color: black;
                 overflow: hidden;
+                height: 100vh;
+                font-family: 'Impact', sans-serif;
+              }
+              .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.85);
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
+                z-index: 9999;
               }
               img {
                 width: 150px;
@@ -86,7 +95,12 @@
             </style>
           </head>
           <body>
-            <img src="saki.gif" alt="SAKI">
+            <div class="overlay">
+              <img src="saki.gif" alt="SAKI">
+            </div>
+            <audio autoplay loop>
+              <source src="scream.mp3" type="audio/mpeg">
+            </audio>
             <script>
               let moveX = 5;
               let moveY = 4;
@@ -106,11 +120,10 @@
     }
 
     document.getElementById("start").addEventListener("click", () => {
-      // Start scream only once
       if (!audioStarted) {
         const scream = document.getElementById("scream");
-        scream.play().catch(e => {
-          alert("Audio playback failed. Tap again or allow autoplay.");
+        scream.play().catch(() => {
+          alert("Enable media playback or tap again to hear SAKI scream.");
         });
         audioStarted = true;
       }
@@ -120,19 +133,18 @@
       }
     });
 
-    // Stop spawning & optionally stop sound
     document.addEventListener("keydown", (event) => {
-      if (event.key.toLowerCase() === 'p' && intervalId) {
+      const key = event.key.toLowerCase();
+      if (key === 'k') {
         clearInterval(intervalId);
         intervalId = null;
-
-        // Optional: uncomment the next line to stop scream when pressing P
-        // document.getElementById("scream").pause();
-
+        document.getElementById("scream").pause();
         windows.forEach(win => {
-          if (!win.closed) win.close();
+          try {
+            if (!win.closed) win.close();
+          } catch (e) {}
         });
-        alert("SAKI stopped!");
+        alert("SAKI was destroyed.");
       }
     });
   </script>
