@@ -40,12 +40,14 @@
   <h1>UNLEASH SAKI</h1>
   <button id="start">UNLEASH SAKI</button>
 
+  <!-- Constant looping scream -->
   <audio id="scream" loop>
     <source src="scream.mp3" type="audio/mpeg">
   </audio>
 
   <script>
     let intervalId = null;
+    let audioStarted = false;
     const windows = [];
 
     function openSakiWindow() {
@@ -104,21 +106,29 @@
     }
 
     document.getElementById("start").addEventListener("click", () => {
-      const scream = document.getElementById("scream");
-      scream.play().catch(e => {
-        alert("Audio playback failed. Tap again or allow media autoplay.");
-      });
+      // Start scream only once
+      if (!audioStarted) {
+        const scream = document.getElementById("scream");
+        scream.play().catch(e => {
+          alert("Audio playback failed. Tap again or allow autoplay.");
+        });
+        audioStarted = true;
+      }
 
       if (!intervalId) {
         intervalId = setInterval(openSakiWindow, 2.5);
       }
     });
 
+    // Stop spawning & optionally stop sound
     document.addEventListener("keydown", (event) => {
       if (event.key.toLowerCase() === 'p' && intervalId) {
         clearInterval(intervalId);
         intervalId = null;
-        document.getElementById("scream").pause();
+
+        // Optional: uncomment the next line to stop scream when pressing P
+        // document.getElementById("scream").pause();
+
         windows.forEach(win => {
           if (!win.closed) win.close();
         });
