@@ -51,7 +51,9 @@
   <script>
     let intervalId = null;
     let audioStarted = false;
-    const windows = [];
+    let windows = [];
+    let screamSpeed = 1.0;
+    let speedTimer;
 
     function openSakiWindow() {
       const width = 300;
@@ -98,7 +100,7 @@
             <div class="overlay">
               <img src="saki.gif" alt="SAKI">
             </div>
-            <audio autoplay loop>
+            <audio autoplay loop id="popupScream">
               <source src="scream.mp3" type="audio/mpeg">
             </audio>
             <script>
@@ -111,6 +113,14 @@
                 if (y + window.outerHeight >= screen.availHeight || y <= 0) moveY *= -1;
                 window.moveTo(x, y);
               }, 20);
+
+              // Speed up scream in popup
+              const scream = document.getElementById("popupScream");
+              let rate = 1.0;
+              setInterval(() => {
+                rate = Math.min(rate + 0.1, 4.0);
+                scream.playbackRate = rate;
+              }, 1000);
             <\/script>
           </body>
           </html>
@@ -120,12 +130,17 @@
     }
 
     document.getElementById("start").addEventListener("click", () => {
+      const scream = document.getElementById("scream");
+
       if (!audioStarted) {
-        const scream = document.getElementById("scream");
-        scream.play().catch(() => {
-          alert("Enable media playback or tap again to hear SAKI scream.");
-        });
+        scream.play().catch(() => alert("Enable sound or tap again to hear SAKI!"));
         audioStarted = true;
+
+        // Gradually speed up the scream
+        speedTimer = setInterval(() => {
+          screamSpeed = Math.min(screamSpeed + 0.1, 4.0);
+          scream.playbackRate = screamSpeed;
+        }, 1000);
       }
 
       if (!intervalId) {
@@ -137,6 +152,7 @@
       const key = event.key.toLowerCase();
       if (key === 'k') {
         clearInterval(intervalId);
+        clearInterval(speedTimer);
         intervalId = null;
         document.getElementById("scream").pause();
         windows.forEach(win => {
@@ -144,7 +160,7 @@
             if (!win.closed) win.close();
           } catch (e) {}
         });
-        alert("SAKI was destroyed.");
+        alert("SAKI neutralized.");
       }
     });
   </script>
